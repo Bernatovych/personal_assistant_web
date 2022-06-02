@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+<div class="container">
+<div class="col-6 offset-3 alert alert-success">
+    <div class="row">
+        <div class="item_form form_margin_top text-center">
+            <form method="post" class="form_margin_left_rigth" novalidate>
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
