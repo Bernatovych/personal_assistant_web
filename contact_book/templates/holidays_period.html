@@ -1,0 +1,10 @@
+<div>
+    <h4>Holidays in {{ period }} days</h4>
+    <hr>
+    {% for result in results %}
+        <div><span class="text-danger">{{ result.0 }}</span> days left:
+            {{ result.1 }}</div>
+    {% empty %}
+        No contacts with birthdays for this period.
+    {% endfor %}
+</div>
