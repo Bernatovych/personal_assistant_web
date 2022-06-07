@@ -1,6 +1,6 @@
 import datetime
 from django import forms
-from contact_book.models import Contact, Phone, Email
+from contact_book.models import Contact, Phone
 
 
 class ContactAddForm(forms.ModelForm):
@@ -19,7 +19,6 @@ class PhoneAddForm(forms.ModelForm):
         fields = ['phone_number']
 
 
-class EmailAddForm(forms.ModelForm):
-    class Meta:
-        model = Email
-        fields = ['email']
+class EmailAddressForm(forms.Form):
+    email = forms.EmailField(label='Email', required=False)
+    address = forms.CharField(label="Address", required=False)

@@ -4,7 +4,7 @@ from contact_book import views
 
 urlpatterns = [
     path('', views.HomePageView.as_view(), name='home'),
-    path('contact_add/', views.ContactAddView.as_view(), name='contact_add'),
+    path('contact_add/', views.contact_add, name='contact_add'),
     path('phone_add/<int:pk>/', views.PhoneAddView.as_view(), name='phone_add'),
     path('address_add/<int:pk>/', views.AddressAddView.as_view(), name='address_add'),
     path('email_add/<int:pk>/', views.EmailAddView.as_view(), name='email_add'),

@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import FormView, CreateView, ListView, DeleteView, UpdateView
+from django.views.generic import CreateView, ListView, DeleteView, UpdateView
 from contact_book.filters import ContactFilter
-from contact_book.forms import ContactAddForm
+from contact_book.forms import ContactAddForm, PhoneAddForm, EmailAddressForm
 from contact_book.models import Contact, Phone, Address, Email
 from django.contrib import messages
 
@@ -33,18 +35,31 @@ class ContactAddMixin(object):
         return super(ContactAddMixin, self).form_valid(form)
 
 
-class ContactAddView(LoginRequiredMixin, SuccessMessageMixin, FormView):
-    model = Contact
-    form_class = ContactAddForm
-    template_name = 'add_form.html'
-    success_url = reverse_lazy('home')
-    success_message = 'Contact was created successfully'
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.user = self.request.user
-        form.save()
-        return super(ContactAddView, self).form_valid(form)
+@login_required
+def contact_add(request):
+    form = ContactAddForm(request.POST)
+    form_phone = PhoneAddForm(request.POST)
+    form_email_address = EmailAddressForm(request.POST)
+    if request.method == 'POST':
+        if form.is_valid() and form_phone.is_valid() and form_email_address.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            form_phone = form_phone.save(commit=False)
+            form_phone.contact = form
+            form_phone.save()
+            email = form_email_address.cleaned_data['email']
+            address = form_email_address.cleaned_data['address']
+            Email.objects.create(email=email, contact=form)
+            Address.objects.create(address=address, contact=form)
+            messages.success(request, 'Contact was created successfully')
+            return redirect('home')
+    else:
+        form = ContactAddForm()
+        form_phone = PhoneAddForm()
+        form_email_address = EmailAddressForm()
+    return render(request, 'contact_form.html', {'form': form, 'form_phone': form_phone,
+                                                 'form_email_address': form_email_address})
 
 
 class PhoneAddView(ContactAddMixin, LoginRequiredMixin, SuccessMessageMixin, CreateView):
