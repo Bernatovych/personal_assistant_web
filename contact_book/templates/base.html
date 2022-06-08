@@ -15,7 +15,7 @@
                         <a class="navbar-brand" href="{% url 'note_book' %}">Note book |</a>
                     {% endif %}
                     {% if request.path != 'file_sorter' %}
-                        <a class="navbar-brand" href="{% url 'home' %}">Files |</a>
+                        <a class="navbar-brand" href="{% url 'file_sorter' %}">Files |</a>
                     {% endif %}
                     {% if request.path != 'news_collector' %}
                         <a class="navbar-brand" href="{% url 'home' %}">News |</a>
