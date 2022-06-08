@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('accounts/profile_update/<int:pk>/', views.ProfileUpdateView.as_view(), name='profile_update'),
+    path('accounts/profile_update/<int:pk>/', views.profile_update, name='profile_update'),
     path('accounts/signup/', views.UserSignUpView.as_view(), name='signup'),
     path('accounts/account_activation_sent/', views.account_activation_sent, name='account_activation_sent'),
     path('activate/<str:uidb64>/<str:token>', views.activate, name='activate'),
