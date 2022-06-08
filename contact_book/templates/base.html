@@ -20,7 +20,7 @@
                     {% if request.path != 'news_collector' %}
                         <a class="navbar-brand" href="{% url 'home' %}">News |</a>
                     {% endif %}
-                    <a class="navbar-brand" href="{% url 'profile_update' request.user.pk %}">Profile |</a>
+                    <a class="navbar-brand" href="{% url 'profile_update' request.user.profile.pk %}">Profile |</a>
                     <a class="navbar-brand" href="{% url 'logout' %}"><i class="fas fa-user-astronaut">Logout:
                         {{ user.username }} </i> <i class="fas fa-sign-out-alt"></i></a>
                 </div>

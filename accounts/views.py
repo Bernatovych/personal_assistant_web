@@ -1,12 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
-from accounts.forms import SignUpForm, ProfileUpdateForm
+from django.views.generic import CreateView
+from accounts.forms import SignUpForm, ProfileUpdateForm, UpdateUserForm
 from .models import Profile
 from django.contrib.sites.shortcuts import get_current_site
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.template.loader import render_to_string
@@ -14,6 +12,7 @@ from .tokens import account_activation_token
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import login
+from django.contrib import messages
 
 
 class UserSignUpView(CreateView):
@@ -58,9 +57,18 @@ def account_activation_sent(request):
     return render(request, 'registration/account_activation_sent.html')
 
 
-class ProfileUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = Profile
-    form_class = ProfileUpdateForm
-    template_name = 'update_form.html'
-    success_url = reverse_lazy('home')
-    success_message = 'Profile was updated successfully'
+@login_required
+def profile_update(request, pk):
+    profile = get_object_or_404(Profile, pk=pk)
+    form = UpdateUserForm(request.POST, instance=profile.user)
+    form_profile = ProfileUpdateForm(request.POST, instance=profile)
+    if request.method == 'POST':
+        if form.is_valid() and form_profile.is_valid():
+            form.save()
+            form_profile.save()
+            messages.success(request, 'Profile was updated successfully')
+            return redirect('home')
+    else:
+        form = UpdateUserForm(instance=profile.user)
+        form_profile = ProfileUpdateForm(instance=profile)
+    return render(request, 'profile_update_form.html', {'form': form, 'form_profile': form_profile})
