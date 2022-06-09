@@ -40,7 +40,7 @@ urlpatterns = [
          name='password_reset_complete'),
     path('', include('contact_book.urls')),
     path('note_book/', include('note_book.urls')),
-    path('file_sorter/', include('file_sorter.urls', namespace='file_sorter')),
+    path('file_sorter/', include('file_sorter.urls')),
     #path('news_collector/', include('news_collector.urls')),
 ]
 
