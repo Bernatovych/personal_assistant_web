@@ -36,7 +36,8 @@ def note_add(request):
             form.user = request.user
             form.save()
             tag = form_tag.cleaned_data['tag']
-            Tag.objects.create(tag=tag, note=form)
+            if tag:
+                Tag.objects.create(tag=tag, note=form)
             messages.success(request, 'Contact was created successfully')
             return redirect('note_book')
     else:
