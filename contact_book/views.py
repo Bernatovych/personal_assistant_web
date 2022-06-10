@@ -90,7 +90,7 @@ class EmailAddView(ContactAddMixin, LoginRequiredMixin, SuccessMessageMixin, Cre
 
 class ContactUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Contact
-    fields = ['first_name', 'last_name', 'birthday']
+    form_class = ContactAddForm
     template_name = 'update_form.html'
     success_url = reverse_lazy('home')
     success_message = 'Contact (%(first_name)s %(last_name)s) was updated successfully'
