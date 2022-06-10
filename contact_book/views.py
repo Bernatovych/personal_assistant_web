@@ -50,8 +50,10 @@ def contact_add(request):
             form_phone.save()
             email = form_email_address.cleaned_data['email']
             address = form_email_address.cleaned_data['address']
-            Email.objects.create(email=email, contact=form)
-            Address.objects.create(address=address, contact=form)
+            if email:
+                Email.objects.create(email=email, contact=form)
+            if address:
+                Address.objects.create(address=address, contact=form)
             messages.success(request, 'Contact was created successfully')
             return redirect('home')
     else:
