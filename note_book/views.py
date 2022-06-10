@@ -85,14 +85,14 @@ class TagUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     fields = ['tag']
     template_name = 'update_form.html'
     success_url = reverse_lazy('note_book')
-    success_message = 'Email (%(tag)s) was updated successfully'
+    success_message = 'Tag (%(tag)s) was updated successfully'
 
 
 class TagDeleteView(LoginRequiredMixin, DeleteView):
     model = Tag
     template_name = 'delete_form.html'
     success_url = reverse_lazy('note_book')
-    success_message = 'Contact (%(tag)s) was deleted successfully'
+    success_message = 'Tag (%(tag)s) was deleted successfully'
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()

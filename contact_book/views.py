@@ -50,8 +50,10 @@ def contact_add(request):
             form_phone.save()
             email = form_email_address.cleaned_data['email']
             address = form_email_address.cleaned_data['address']
-            Email.objects.create(email=email, contact=form)
-            Address.objects.create(address=address, contact=form)
+            if email:
+                Email.objects.create(email=email, contact=form)
+            if address:
+                Address.objects.create(address=address, contact=form)
             messages.success(request, 'Contact was created successfully')
             return redirect('home')
     else:
@@ -88,7 +90,7 @@ class EmailAddView(ContactAddMixin, LoginRequiredMixin, SuccessMessageMixin, Cre
 
 class ContactUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Contact
-    fields = ['first_name', 'last_name', 'birthday']
+    form_class = ContactAddForm
     template_name = 'update_form.html'
     success_url = reverse_lazy('home')
     success_message = 'Contact (%(first_name)s %(last_name)s) was updated successfully'
