@@ -11,7 +11,7 @@ def upload_to(instance, filename):
         'video': ('AVI', 'MP4', 'MOV', 'MKV'),
         'archives': ('ZIP', 'GZ', 'TAR')
     }
-    user_subdir = str(instance.user.id)
+    user_subdir = instance.user.username
     p = Path(settings.MEDIA_ROOT, user_subdir)
     ext = Path(filename).suffix[1:]
     for key, value in CATEGORIES.items():
