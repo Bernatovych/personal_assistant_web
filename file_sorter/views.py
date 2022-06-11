@@ -1,12 +1,22 @@
-from django.shortcuts import render, HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, HttpResponse
+from .forms import UploadFileForm
+from django.contrib import messages
 
-# Create your views here.
-def index(request):
-    return render(request, "index.html")
 
-def send_files(request):
-    if request.method == "POST":
-        name = request.POST.get("filename")
-        myfile = request.FILES.getlist("uploadfoles")
-        print(f"It's my file: {myfile}")    
-        return HttpResponse("ok")
+@login_required
+def uploadfile(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            messages.success(request, 'The file is saved successfully.')
+            return redirect('file_sorter')
+        else:
+            messages.error(request, f'The following error has occured: {form.errors.as_data()}')
+            return redirect('file_sorter')
+    else:
+        form = UploadFileForm()
+    return render(request, 'index.html', {'form': form})

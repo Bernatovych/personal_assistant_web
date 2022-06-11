@@ -1,11 +1,16 @@
-from django.conf import settings
+from django.contrib.auth.models import User
+# from django.conf import settings
 from django.db import models
 
-# Create your models here.
 
 def upload_to(instance, filename):
-    return f"{settings.MEDIA_URL.append({instance.user.user.id}).append({filename})}"
+    print( '--- FILES:', '/'.join(['content', instance.user.id, filename]) )
+    return '/'.join(['content', instance.user.id, filename])
 
-class MyUploadFile(models.Model):
+class UploadFile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='files')
     f_name = models.CharField(max_length=255)
-    myfiles = models.FileField(upload_to=upload_to)
+    myfiles = models.FileField(upload_to='upload_to/')
+
+    def __str__(self):
+        return self.myfiles
