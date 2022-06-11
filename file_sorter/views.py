@@ -19,4 +19,4 @@ def uploadfile(request):
             return redirect('file_sorter')
     else:
         form = UploadFileForm()
-    return render(request, 'index.html', {'form': form})
+    return render(request, 'uploadfoles.html', {'form': form})
