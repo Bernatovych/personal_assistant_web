@@ -1,9 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from contact_book.views import UserAccessTestMixin
 from note_book.filters import NoteFilter
 from note_book.forms import NoteAddForm, TagAddForm
 from note_book.models import Note, Tag
@@ -21,7 +23,7 @@ class NotePageView(LoginRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
-        qs = self.model.objects.filter(user=self.request.user)
+        qs = self.model.objects.filter(user=self.request.user).order_by('text')
         contacts = NoteFilter(self.request.GET, queryset=qs)
         return contacts.qs
 
@@ -37,7 +39,7 @@ def note_add(request):
             form.save()
             tag = form_tag.cleaned_data['tag']
             if tag:
-                Tag.objects.create(tag=tag, note=form)
+                Tag.objects.create(tag=tag, note=form, user=request.user)
             messages.success(request, 'Contact was created successfully')
             return redirect('note_book')
     else:
@@ -49,28 +51,33 @@ def note_add(request):
 class TagAddView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Tag
     fields = ['tag']
-    template_name = 'add_form.html'
+    template_name = 'note_add_form.html'
     success_url = reverse_lazy('note_book')
     success_message = 'Tag was created successfully'
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        obj.note = Note.objects.get(id=self.kwargs['pk'])
-        form.save()
+        note = Note.objects.get(id=self.kwargs['pk'])
+        if note.user == self.request.user:
+            obj.note = Note.objects.get(id=self.kwargs['pk'])
+            obj.user = self.request.user
+            form.save()
+        else:
+            raise PermissionDenied
         return super(TagAddView, self).form_valid(form)
 
 
-class NoteUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class NoteUpdateView(LoginRequiredMixin, UserAccessTestMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Note
     fields = ['text']
-    template_name = 'update_form.html'
+    template_name = 'note_update_form.html'
     success_url = reverse_lazy('note_book')
     success_message = 'Note (%(text)s) was updated successfully'
 
 
-class NoteDeleteView(LoginRequiredMixin, DeleteView):
+class NoteDeleteView(LoginRequiredMixin, UserAccessTestMixin, UserPassesTestMixin, DeleteView):
     model = Note
-    template_name = 'delete_form.html'
+    template_name = 'note_delete_form.html'
     success_url = reverse_lazy('note_book')
     success_message = 'Note (%(text)s) was deleted successfully'
 
@@ -80,17 +87,17 @@ class NoteDeleteView(LoginRequiredMixin, DeleteView):
         return super(NoteDeleteView, self).delete(request, *args, **kwargs)
 
 
-class TagUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class TagUpdateView(LoginRequiredMixin, UserAccessTestMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Tag
     fields = ['tag']
-    template_name = 'update_form.html'
+    template_name = 'note_update_form.html'
     success_url = reverse_lazy('note_book')
     success_message = 'Tag (%(tag)s) was updated successfully'
 
 
-class TagDeleteView(LoginRequiredMixin, DeleteView):
+class TagDeleteView(LoginRequiredMixin, UserAccessTestMixin, UserPassesTestMixin, DeleteView):
     model = Tag
-    template_name = 'delete_form.html'
+    template_name = 'note_delete_form.html'
     success_url = reverse_lazy('note_book')
     success_message = 'Tag (%(tag)s) was deleted successfully'
 

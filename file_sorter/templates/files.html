@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load holidays_period_tag %}
+{% load news_tag %}
+{% load bootstrap5 %}
+
+{% block content %}
+<div class="row">
+    <div class="col-10">
+        <div class="row">
+            <h1 class="col-3">
+                Files list <a class="btn btn-success btn-sm" href="{% url 'file_add' %}"> Add</a>
+            </h1>
+            <div class="col-9">
+                <form class="alert alert-primary " method="get">
+                    <div class="row">
+                        <div class="col">
+                            <input name="{{ filter.form.name.html_name }}" type="text" class="form-control"
+                                   id="{{ filter.form.name.id_for_label }}" placeholder="Enter file name">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-success px-4" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in page_obj %}
+                    <tr>
+                        <td>
+                            <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false"></button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="{% url 'file_download' file.pk %}">Download</a></li>
+                                <li><a class="dropdown-item text-danger"
+                                       href="{% url 'file_delete' file.pk %}">Delete</a></li>
+                            </ul>
+                            {{ file.name }}
+                        </td>
+                        <td>
+                            {% if file.category == 'images' %}
+                                <a href="{% url 'images' %}">{{ file.category }}</a>
+                            {% elif file.category == 'documents' %}
+                                <a href="{% url 'documents' %}">{{ file.category }}</a>
+                            {% elif file.category == 'audio' %}
+                                <a href="{% url 'audio' %}">{{ file.category }}</a>
+                            {% elif file.category == 'video' %}
+                                <a href="{% url 'video' %}">{{ file.category }}</a>
+                            {% elif file.category == 'archives' %}
+                                <a href="{% url 'archives' %}">{{ file.category }}</a>
+                            {% elif file.category == 'other' %}
+                                <a href="{% url 'other' %}">{{ file.category }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ file.created|date:"d.m.Y H:i" }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">
+                             empty...
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            {% if page_obj.has_other_pages %}
+            <div class="btn-group" role="group" aria-label="Item pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+                {% endif %}
+                {% for page_number in page_obj.paginator.page_range %}
+                    {% if page_obj.number == page_number %}
+                        <button class="btn btn-outline-primary active">
+                            <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+                        </button>
+                    {% else %}
+                        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+                            {{ page_number }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+                {% endif %}
+            </div>
+            <hr>
+            {% endif %}
+    </div>
+    <div class="col-2">
+        <div class="alert alert-info">
+            {% include 'category_list.html' %}
+        </div>
+        {% if user.profile.is_weather == True %}
+        <div class="alert alert-info">
+            {% weather %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="container">
+        <div class="row">
+        {% if user.profile.is_football == True %}
+            <div class="{% if user.profile.is_news == True %}col-6{% else %}col-12{% endif %}">
+                <div class="col-12 alert alert-info">
+                    {% football %}
+                </div>
+            </div>
+        {% endif %}
+        {% if user.profile.is_news == True %}
+            <div class="{% if user.profile.is_football == True %}col-6{% else %}col-12{% endif %}">
+                <div class="col-12 alert alert-info">
+                    {% news %}
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

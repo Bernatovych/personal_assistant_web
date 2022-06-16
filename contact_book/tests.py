@@ -7,8 +7,8 @@ from django.template import Context, Template
 from accounts.models import Profile
 from .forms import ContactAddForm, PhoneAddForm, EmailAddressForm
 from .models import Contact, Phone, Email, Address
-from .views import contact_add, PhoneAddView, EmailAddView, AddressAddView, ContactUpdateView, PhoneUpdateView, \
-    EmailUpdateView, AddressUpdateView, ContactDeleteView, PhoneDeleteView, EmailDeleteView, AddressDeleteView
+from .views import contact_add, PhoneAddView, EmailAddView, AddressAddView, ContactView, PhoneView, \
+    EmailView, AddressView, ContactDeleteView, PhoneDeleteView, EmailDeleteView, AddressDeleteView
 
 
 class ContactListTests(TestCase):
@@ -129,12 +129,12 @@ class NewPhoneTests(TestCase):
         self.username = 'test'
         self.password = 'test_user'
         self.user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
-        contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
-        Phone.objects.create(phone_number='+380631111111', contact=contact)
-        self.client.login(username='test', password='test_user')
+        self.contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
+        Phone.objects.create(phone_number='+380631111111', contact=self.contact, user=self.user)
+        self.client.login(username=self.username, password=self.password)
 
     def test_new_phone_view_success_status_code(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
@@ -143,41 +143,33 @@ class NewPhoneTests(TestCase):
         self.assertEquals(view.func.view_class, PhoneAddView)
 
     def test_csrf(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertContains(response, 'csrfmiddlewaretoken')
 
     def test_new_phone_valid_post_data(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         data = {'phone_number': '+380631111112'}
         self.client.post(url, data)
         self.assertTrue(Phone.objects.exists())
 
     def test_new_phone_invalid_post_data(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         response = self.client.post(url, {})
         form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
         self.assertTrue(form.errors)
 
     def test_new_phone_invalid_post_data_empty_fields(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         data = {'phone_number': ''}
         response = self.client.post(url, data)
         form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
         self.assertTrue(form.errors)
 
-    def test_new_phone_invalid_phone_exist_data(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
-        data = {'phone_number': '+380631111111'}
-        response = self.client.post(url, data)
-        form = response.context.get('form')
-        self.assertEquals(response.status_code, 200)
-        self.assertTrue(form.errors)
-
     def test_new_phone_invalid_phone_data(self):
-        url = reverse('phone_add', kwargs={'pk': 1})
+        url = reverse('phone_add', kwargs={'pk': self.contact.pk})
         data = {'phone_number': '+380631111'}
         response = self.client.post(url, data)
         form = response.context.get('form')
@@ -190,11 +182,11 @@ class NewEmailTests(TestCase):
         self.username = 'test'
         self.password = 'test_user'
         self.user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
-        Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
-        self.client.login(username='test', password='test_user')
+        self.contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
+        self.client.login(username=self.username, password=self.password)
 
     def test_new_email_view_success_status_code(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
@@ -203,25 +195,25 @@ class NewEmailTests(TestCase):
         self.assertEquals(view.func.view_class, EmailAddView)
 
     def test_csrf(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertContains(response, 'csrfmiddlewaretoken')
 
     def test_new_email_valid_post_data(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         data = {'email': 'test@test.ua'}
         self.client.post(url, data)
         self.assertTrue(Email.objects.exists())
 
     def test_new_email_invalid_post_data(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         response = self.client.post(url, {})
         form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
         self.assertTrue(form.errors)
 
     def test_new_email_invalid_post_data_empty_fields(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         data = {'email': ''}
         response = self.client.post(url, data)
         form = response.context.get('form')
@@ -229,7 +221,7 @@ class NewEmailTests(TestCase):
         self.assertTrue(form.errors)
 
     def test_new_email_invalid_email_data(self):
-        url = reverse('email_add', kwargs={'pk': 1})
+        url = reverse('email_add', kwargs={'pk': self.contact.pk})
         data = {'phone_number': 'test@test'}
         response = self.client.post(url, data)
         form = response.context.get('form')
@@ -242,11 +234,11 @@ class NewAddressTests(TestCase):
         self.username = 'test'
         self.password = 'test_user'
         self.user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
-        Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
+        self.contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01', user=self.user)
         self.client.login(username='test', password='test_user')
 
     def test_new_address_view_success_status_code(self):
-        url = reverse('address_add', kwargs={'pk': 1})
+        url = reverse('address_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
@@ -255,25 +247,25 @@ class NewAddressTests(TestCase):
         self.assertEquals(view.func.view_class, AddressAddView)
 
     def test_csrf(self):
-        url = reverse('address_add', kwargs={'pk': 1})
+        url = reverse('address_add', kwargs={'pk': self.contact.pk})
         response = self.client.get(url)
         self.assertContains(response, 'csrfmiddlewaretoken')
 
     def test_new_address_valid_post_data(self):
-        url = reverse('address_add', kwargs={'pk': 1})
+        url = reverse('address_add', kwargs={'pk': self.contact.pk})
         data = {'address': 'test'}
         self.client.post(url, data)
         self.assertTrue(Address.objects.exists())
 
     def test_new_address_invalid_post_data(self):
-        url = reverse('address_add', kwargs={'pk': 1})
+        url = reverse('address_add', kwargs={'pk': self.contact.pk})
         response = self.client.post(url, {})
         form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
         self.assertTrue(form.errors)
 
     def test_new_address_invalid_post_data_empty_fields(self):
-        url = reverse('address_add', kwargs={'pk': 1})
+        url = reverse('address_add', kwargs={'pk': self.contact.pk})
         data = {'address': ''}
         response = self.client.post(url, data)
         form = response.context.get('form')
@@ -288,9 +280,9 @@ class UpdateViewTestCase(TestCase):
         self.user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
         self.contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01',
                                               user=self.user)
-        self.phone = Phone.objects.create(phone_number='+380631111111', contact=self.contact)
-        self.email = Email.objects.create(email='test@test.ua', contact=self.contact)
-        self.address = Address.objects.create(address='test, 70', contact=self.contact)
+        self.phone = Phone.objects.create(phone_number='+380631111111', contact=self.contact, user=self.user)
+        self.email = Email.objects.create(email='test@test.ua', contact=self.contact, user=self.user)
+        self.address = Address.objects.create(address='test, 70', contact=self.contact, user=self.user)
         self.contact_url = reverse('contact_update', kwargs={'pk': self.contact.pk})
         self.phone_url = reverse('phone_update', kwargs={'pk': self.phone.pk})
         self.email_url = reverse('email_update', kwargs={'pk': self.email.pk})
@@ -308,7 +300,7 @@ class ContactUpdateViewTests(UpdateViewTestCase):
 
     def test_view_class(self):
         view = resolve('/contact_update/1/')
-        self.assertEquals(view.func.view_class, ContactUpdateView)
+        self.assertEquals(view.func.view_class, ContactView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -364,7 +356,7 @@ class PhoneUpdateViewTests(UpdateViewTestCase):
 
     def test_view_class(self):
         view = resolve('/phone_update/1/')
-        self.assertEquals(view.func.view_class, PhoneUpdateView)
+        self.assertEquals(view.func.view_class, PhoneView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -431,7 +423,7 @@ class EmailUpdateViewTests(UpdateViewTestCase):
 
     def test_view_class(self):
         view = resolve('/email_update/1/')
-        self.assertEquals(view.func.view_class, EmailUpdateView)
+        self.assertEquals(view.func.view_class, EmailView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -498,7 +490,7 @@ class AddressUpdateViewTests(UpdateViewTestCase):
 
     def test_view_class(self):
         view = resolve('/address_update/1/')
-        self.assertEquals(view.func.view_class, AddressUpdateView)
+        self.assertEquals(view.func.view_class, AddressView)
 
     def test_csrf(self):
         self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -547,9 +539,9 @@ class DeleteViewTestCase(TestCase):
         self.user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
         self.contact = Contact.objects.create(first_name='Test', last_name='Test', birthday='1900-01-01',
                                               user=self.user)
-        self.phone = Phone.objects.create(phone_number='+380631111111', contact=self.contact)
-        self.email = Email.objects.create(email='test@test.ua', contact=self.contact)
-        self.address = Address.objects.create(address='test, 70', contact=self.contact)
+        self.phone = Phone.objects.create(phone_number='+380631111111', contact=self.contact, user=self.user)
+        self.email = Email.objects.create(email='test@test.ua', contact=self.contact, user=self.user)
+        self.address = Address.objects.create(address='test, 70', contact=self.contact, user=self.user)
         self.contact_url = reverse('contact_delete', kwargs={'pk': self.contact.pk})
         self.phone_url = reverse('phone_delete', kwargs={'pk': self.phone.pk})
         self.email_url = reverse('email_delete', kwargs={'pk': self.email.pk})
@@ -667,7 +659,7 @@ class TemplateTagTest(TestCase):
         context = Context({'title': f'Holidays in {self.profile.period} days', 'user': self.user})
         template_to_render = Template('{% load holidays_period_tag %}''{% holidays_period %}')
         rendered_template = template_to_render.render(context)
-        self.assertInHTML('<h4>Holidays in 7 days</h4>', rendered_template)
+        self.assertInHTML('<h5>Holidays in 7 days</h5>', rendered_template)
         self.assertInHTML("<div><span class='text-danger'>6</span> days left: Test Test</div>", rendered_template)
 
 
@@ -688,5 +680,5 @@ class TemplateTagTest1(TestCase):
         context = Context({'title': f'Holidays in {self.profile.period} days', 'user': self.user})
         template_to_render = Template('{% load holidays_period_tag %}''{% holidays_period %}')
         rendered_template = template_to_render.render(context)
-        self.assertInHTML('<h4>Holidays in 365 days</h4>', rendered_template)
+        self.assertInHTML('<h5>Holidays in 365 days</h5>', rendered_template)
         self.assertInHTML("<div><span class='text-danger'>361</span> days left: Test Test</div>", rendered_template)

@@ -11,3 +11,4 @@ class NoteAddForm(forms.ModelForm):
 class TagAddForm(forms.Form):
     tag = forms.CharField(label='Tag', required=False)
 
+

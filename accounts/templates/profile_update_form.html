@@ -8,7 +8,6 @@
         <form role="form" method="post">
             {% csrf_token %}
             {% bootstrap_form form %}
-            <hr>
             {% bootstrap_form form_profile %}
             <button type="submit" class="btn btn-success btn-sm ">Submit</button>
             <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm" role="button">Cancel</a>
