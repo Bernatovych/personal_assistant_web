@@ -28,7 +28,7 @@ SITE_LIST = (({'category': 'news', 'website': 'https://itc.ua/ua/novini/', 'elem
                     'element': 'div', 'attribute': 'class', 'value': 'item-title'}),)
 
 
-@periodic_task(run_every=(crontab(minute='*/2')), name="pars_task", ignore_result=True)
+@periodic_task(run_every=(crontab(minute='*/15')), name="pars_task", ignore_result=True)
 def pars_task():
     for site in SITE_LIST:
         website = site['website']
