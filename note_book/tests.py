@@ -107,7 +107,7 @@ class NewTagTests(TestCase):
         self.client.login(username='test', password='test_user')
 
     def test_new_tag_view_success_status_code(self):
-        url = reverse('tag_add', kwargs={'pk': 1})
+        url = reverse('tag_add', kwargs={'pk': self.note.pk})
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
 
@@ -116,25 +116,25 @@ class NewTagTests(TestCase):
         self.assertEquals(view.func.view_class, TagAddView)
 
     def test_csrf(self):
-        url = reverse('tag_add', kwargs={'pk': 1})
+        url = reverse('tag_add', kwargs={'pk': self.note.pk})
         response = self.client.get(url)
         self.assertContains(response, 'csrfmiddlewaretoken')
 
     def test_new_tag_valid_post_data(self):
-        url = reverse('tag_add', kwargs={'pk': 1})
+        url = reverse('tag_add', kwargs={'pk': self.note.pk})
         data = {'tag': 'test'}
         self.client.post(url, data)
         self.assertTrue(Tag.objects.exists())
 
     def test_new_tag_invalid_post_data(self):
-        url = reverse('tag_add', kwargs={'pk': 1})
+        url = reverse('tag_add', kwargs={'pk': self.note.pk})
         response = self.client.post(url, {})
         form = response.context.get('form')
         self.assertEquals(response.status_code, 200)
         self.assertTrue(form.errors)
 
     def test_new_tag_invalid_post_data_empty_fields(self):
-        url = reverse('tag_add', kwargs={'pk': 1})
+        url = reverse('tag_add', kwargs={'pk': self.note.pk})
         data = {'text': ''}
         response = self.client.post(url, data)
         self.assertEquals(response.status_code, 200)
@@ -210,7 +210,7 @@ class TagUpdateViewTestCase(TestCase):
         self.password = 'test_user'
         user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
         self.note = Note.objects.create(text='text', user=user)
-        self.tag = Tag.objects.create(tag='tag', note=self.note)
+        self.tag = Tag.objects.create(tag='tag', note=self.note, user=user)
         self.url = reverse('tag_update', kwargs={'pk': self.tag.pk})
 
 
@@ -306,7 +306,7 @@ class TagDeleteViewTestCase(TestCase):
         self.password = 'test_user'
         user = User.objects.create_user(username=self.username, email='test@test.com', password=self.password)
         self.note = Note.objects.create(text='text', user=user)
-        self.tag = Tag.objects.create(tag='tag', note=self.note)
+        self.tag = Tag.objects.create(tag='tag', note=self.note, user=user)
         self.url = reverse('tag_delete', kwargs={'pk': self.tag.pk})
 
 

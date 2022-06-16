@@ -260,7 +260,7 @@ class SuccessfulProfileUpdateViewTests(ProfileUpdateViewTestCase):
         self.client.login(username=self.username, password=self.password)
         self.response = self.client.post(self.url, {'username': 'Test1', 'email': 'test1@test.com',
                                                     'period': 8, 'is_news': 'True', 'is_weather': 'True',
-                                                    'is_exchange_rate': 'True'})
+                                                    'is_football': 'True'})
 
     def test_redirection(self):
         note_book_url = reverse('home')
@@ -273,7 +273,7 @@ class SuccessfulProfileUpdateViewTests(ProfileUpdateViewTestCase):
         self.assertEquals(self.profile.period, 8)
         self.assertEquals(self.profile.is_news, True)
         self.assertEquals(self.profile.is_weather, True)
-        self.assertEquals(self.profile.is_exchange_rate, True)
+        self.assertEquals(self.profile.is_football, True)
 
 
 class InvalidProfileUpdateViewTests(ProfileUpdateViewTestCase):

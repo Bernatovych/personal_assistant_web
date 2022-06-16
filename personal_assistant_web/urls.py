@@ -21,7 +21,7 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('accounts/profile_update/<int:pk>/', views.profile_update, name='profile_update'),
@@ -38,6 +38,10 @@ urlpatterns = [
          name='password_reset_complete'),
     path('', include('contact_book.urls')),
     path('note_book/', include('note_book.urls')),
-    #path('file_sorter/', include('file_sorter.urls')),
-    #path('news_collector/', include('news_collector.urls')),
+    path('file_sorter/', include('file_sorter.urls')),
 ]
+
+handler404 = 'contact_book.views.custom_page_not_found_view'
+handler500 = 'contact_book.views.custom_error_view'
+handler403 = 'contact_book.views.custom_permission_denied_view'
+handler400 = 'contact_book.views.custom_bad_request_view'

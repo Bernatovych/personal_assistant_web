@@ -34,3 +34,4 @@ def holidays_period(context):
                 results.append((days_to_birthday(str(i.birthday)), i.__str__()))
     results.sort()
     return {'results': results, 'period': period}
+

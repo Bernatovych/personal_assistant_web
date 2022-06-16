@@ -11,7 +11,7 @@ class Profile(models.Model):
                                  verbose_name='Birthday in period', default=7)
     is_news = models.BooleanField(default=False, verbose_name='News')
     is_weather = models.BooleanField(default=False, verbose_name='Weather')
-    is_exchange_rate = models.BooleanField(default=False, verbose_name='Exchange Rate')
+    is_football = models.BooleanField(default=False, verbose_name='Football')
     email_confirmed = models.BooleanField(default=False)
 
 

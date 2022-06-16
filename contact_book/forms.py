@@ -1,5 +1,7 @@
 import datetime
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
+
 from contact_book.models import Contact, Phone
 
 
@@ -22,3 +24,4 @@ class PhoneAddForm(forms.ModelForm):
 class EmailAddressForm(forms.Form):
     email = forms.EmailField(label='Email', required=False)
     address = forms.CharField(label="Address", required=False)
+

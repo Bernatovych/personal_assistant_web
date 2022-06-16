@@ -11,6 +11,7 @@ class Note(models.Model):
 
 
 class Tag(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tags')
     note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='tags')
     tag = models.CharField(max_length=50, verbose_name='Tag')
 

@@ -1,0 +1,9 @@
+<div class="text-left">
+    <h5>Football news today</h5>
+    <hr>
+    {% for i in football_qs %}
+        <div>
+            <a href='{{ i.url }}'>{{ i.title|truncatechars:65 }}</a>
+        </div>
+    {% endfor %}
+</div>

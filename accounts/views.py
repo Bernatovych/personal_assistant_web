@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.views.generic import CreateView
 from accounts.forms import SignUpForm, ProfileUpdateForm, UpdateUserForm
 from .models import Profile
@@ -60,6 +61,8 @@ def account_activation_sent(request):
 @login_required
 def profile_update(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
+    if profile.user != request.user:
+        raise PermissionDenied
     form = UpdateUserForm(request.POST, instance=profile.user)
     form_profile = ProfileUpdateForm(request.POST, instance=profile)
     if request.method == 'POST':
