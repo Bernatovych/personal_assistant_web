@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+    <div class="alert alert-primary">
+    <h3>Update</h3>
+        <form role="form" method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-success btn-sm ">Submit</button>
+            <a href="{% url 'note_book' %}" class="btn btn-outline-secondary btn-sm" role="button">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

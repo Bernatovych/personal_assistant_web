@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block content %}
+    <div class="alert alert-warning">
+        <h3>Delete</h3>
+        <form method="post">
+            {% csrf_token %}
+            <h5>Are you sure you want to delete "{{ object }}"?</h5>
+            <button type="submit" class="btn btn-danger btn-sm ">Submit</button>
+            <a href="{% url 'note_book' %}" class="btn btn-outline-secondary btn-sm" role="button">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

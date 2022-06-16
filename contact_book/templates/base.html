@@ -3,15 +3,23 @@
 
 {% block bootstrap5_content %}
     <div class="container">
-        <div class="col-6 offset-3">
+        <div class="col-12">
         <nav class="navbar navbar-default">
             <div class="container">
             {% if user.is_authenticated %}
                 <div class="navbar-header">
                     {% if request.path != '/' %}
-                        <a class="navbar-brand" href="{% url 'home' %}">Home |</a>
+                        <a class="navbar-brand" href="{% url 'home' %}">Contact book |</a>
                     {% endif %}
-                    <a class="navbar-brand" href="{% url 'logout' %}"><i class="fas fa-user-astronaut">Logout: {{ user.username }} </i> <i class="fas fa-sign-out-alt"></i></a>
+                    {% if request.path != '/note_book/' %}
+                        <a class="navbar-brand" href="{% url 'note_book' %}">Note book |</a>
+                    {% endif %}
+                    {% if request.path != 'file_sorter' %}
+                        <a class="navbar-brand" href="{% url 'files_list' %}">Files |</a>
+                    {% endif %}
+                    <a class="navbar-brand" href="{% url 'profile_update' request.user.profile.pk %}">Profile |</a>
+                    <a class="navbar-brand" href="{% url 'logout' %}"><i class="fas fa-user-astronaut">Logout:
+                        {{ user.username }} </i> <i class="fas fa-sign-out-alt"></i></a>
                 </div>
             {% endif %}
             </div>

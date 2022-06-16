@@ -1,0 +1,10 @@
+<div class="text-center">
+    <h5>Weather now</h5>
+    <hr>
+    {% for i in weather_qs %}
+        <div>
+            <h6>{{ i.url }}</h6>
+            <h3>{{ i.title }}</h3>
+        </div>
+    {% endfor %}
+</div>

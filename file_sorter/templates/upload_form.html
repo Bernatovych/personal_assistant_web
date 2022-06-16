@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+<div class="container">
+    <h3 class="text-center">File upload</h3>
+    <div class="col-lg-4 offset-4 alert alert-primary">
+        <div class="col-md-12 col-sm-12 col-12 text-center">
+           <form class="col-md-12" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="form_button">
+                    <button type="submit" class="btn btn-success">Add</button>
+                    <a href="{% url 'files_list' %}" class="btn btn-outline-secondary" role="button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
